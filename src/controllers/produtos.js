@@ -3,11 +3,22 @@ const db = require('../database/connection');
 module.exports = {
    async listarProdutos (request, response) {
   try{
+
+   const sql = `
+      SELECT
+      prod_id, emp_id, cat_id, prod_nome, prod_desc, prod_est, prod_preco
+      FROM PRODUTOS;
+   `;
+
+   const [row] = await db.query(sql);
+   const nItens = row.length
+
     return response.status(200).json({
 
         sucesso: true,
         mensagem:'lista de produtos',
-        dados: null
+        nItens,
+        dados: row
 
      })
       }

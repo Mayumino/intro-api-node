@@ -1,18 +1,27 @@
 const db = require('../database/connection');
 
 module.exports = {
-   async listarPed_produtos (request, response) {
+   async listarPedido_produto (request, response) {
   try{
+
+   const sql = `
+      SELECT
+      pedpro_id, prod_id, ped_id, pedpro_preco_unit, pedpro_quant
+      FROM Pedido_produto
+   `;
+
+   const [row] = await db.query(sql);
+   const nItens = row.length
+
     return response.status(200).json({
 
         sucesso: true,
         mensagem:'lista de produtos pedidos',
-        dados: null
-
-     })
-      }
-
-     catch (error){
+        nItens,
+        dados: row
+      })
+   
+   } catch (error){
          
      return response.status(500).json({
 
@@ -26,7 +35,7 @@ module.exports = {
     },
 
 
-   async cadastrarPed_produtos (request, response) {
+   async cadastrarPedido_produto (request, response) {
   try{
     return response.status(200).json({
 
@@ -51,7 +60,7 @@ module.exports = {
     },
 
 
-   async editarPed_produtos (request, response) {
+   async editarPedido_produto (request, response) {
   try{
     return response.status(200).json({
 
@@ -76,7 +85,7 @@ module.exports = {
     },
 
 
-   async apagarPed_produtos (request, response) {
+   async apagarPedido_produto (request, response) {
   try{
     return response.status(200).json({
 
