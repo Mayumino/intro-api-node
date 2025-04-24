@@ -36,7 +36,25 @@ module.exports = {
 
 
    async cadastrarPedido_produto (request, response) {
-  try{
+
+   try{
+
+      const {precoPorUnidade, valorDoPedido} = request.body;
+
+      const sql = `
+         INSERT INTO pedido_produto
+            (pedpro_preco_unit, pedpro_quant)
+         VALUES
+            (? , ?);
+      `
+      const values = [precoPorUnidade, valorDoPedido];
+      const [result] = await db.query(sql, values);
+
+      const dados = {
+         id: result.insertId,
+        precoPorUnidade,
+        valorDoPedido
+      };
     return response.status(200).json({
 
         sucesso: true,

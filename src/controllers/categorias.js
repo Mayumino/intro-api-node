@@ -38,7 +38,24 @@ module.exports = {
 
 
    async cadastrarCategoria (request, response) {
-  try{
+      try{
+
+         const {categoriaNome, categoriaDescricao} = request.body;
+   
+         const sql = `
+            INSERT INTO categoria
+               (cat_nome, cat_desc)
+            VALUES
+               (? , ?);
+         `
+         const values = [categoriaNome, categoriaDescricao];
+         const [result] = await db.query(sql, values);
+   
+         const dados = {
+            id: result.insertId,
+            categoriaNome,
+            categoriaDescricao
+         };
     return response.status(200).json({
 
         sucesso: true,
