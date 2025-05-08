@@ -5,7 +5,7 @@ module.exports = {
       try {
          const sql = `
             SELECT
-            prod_id, emp_id, cat_id, prod_nome, prod_desc, prod_est, prod_preco
+            prod_id, prod_nome, prod_desc, prod_est, prod_preco
             FROM PRODUTOS;
             `;
          const [row] = await db.query(sql);
@@ -31,21 +31,19 @@ module.exports = {
    async cadastrarProdutos (request, response) {
       try{
 
-         const {empresa, categoria, nomeProduto, descricao, estoque, preco} = request.body;
+         const {nomeProduto, descricao, estoque, preco} = request.body;
 
          const sql = `
             INSERT INTO produtos
-               (emp_id, cat_id, prod_nome, prod_desc, prod_est, prod_preco)
+               (prod_nome, prod_desc, prod_est, prod_preco)
             VALUES
-               (?, ?, ?, ? , ? ,?);
+               (?, ?, ?, ? );
          `
-         const values = [empresa, categoria, nomeProduto, descricao, estoque, preco];
+         const values = [nomeProduto, descricao, estoque, preco];
          const [result] = await db.query(sql, values);
 
          const dados = {
             id: result.insertId,
-            empresa,
-            categoria,
             nomeProduto,
             descricao,
             estoque,
@@ -70,27 +68,48 @@ module.exports = {
 
    async editarProdutos (request, response) {
   try{
-    return response.status(200).json({
+   const {nomeProduto, descricao, estoque, preco} = request.body;
+   const {id} = request.params;
 
-        sucesso: true,
-        mensagem:'editar produto',
-        dados: null
+         const sql = `
+            UPDATE produtos SET
+               (prod_nome = ?, prod_desc = ?, prod_est = ?, prod_preco = ?)
+            WHERE
+               prod_id = ?;
+         `;
+         const values = [nomeProduto, descricao, estoque, preco, id];
+         const [result] = await db.query(sql, values);
 
-     })
+         if (result.affectedRows === 0) {
+            return response.status(404).json({
+               sucesso: false,
+               mensagem:`Erro ao encontrar o produto ${id}.`,
+               dados: null
+            });
+         }
+
+         const dados = {
+            nomeProduto,
+            descricao,
+            estoque,
+            preco
+         };
+   
+      return response.status(200).json({
+          sucesso: true,
+          mensagem:`O produto ${id} foi atualizado com sucesso!`,
+          dados
+      });
+
+   }  catch (error){
+         return response.status(500).json({
+          sucesso: false,
+            mensagem:`Erro ao atualizar o produto ${id}.`,
+            dados: error.message
+         })
       }
 
-     catch (error){
-         
-     return response.status(500).json({
-
-        sucesso: false,
-        mensagem:'erro na na edição do produto',
-        dados: error.message
-     })
-
-     }
-
-    },
+   },
 
 
    async apagarProdutos (request, response) {
