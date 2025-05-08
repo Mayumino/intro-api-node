@@ -83,7 +83,7 @@ module.exports = {
          if (result.affectedRows === 0) {
             return response.status(404).json({
                sucesso: false,
-               mensagem:`Erro ao encontrar o produto ${id}.`,
+               mensagem:`Erro ao encontrar o produto`,
                dados: null
             });
          }
@@ -97,14 +97,14 @@ module.exports = {
    
       return response.status(200).json({
           sucesso: true,
-          mensagem:`O produto ${id} foi atualizado com sucesso!`,
+          mensagem:`O produto foi atualizado com sucesso!`,
           dados
       });
 
    }  catch (error){
          return response.status(500).json({
           sucesso: false,
-            mensagem:`Erro ao atualizar o produto ${id}.`,
+            mensagem:`Erro ao atualizar o produto.`,
             dados: error.message
          })
       }

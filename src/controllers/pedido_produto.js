@@ -51,7 +51,7 @@ module.exports = {
       const [result] = await db.query(sql, values);
 
       const dados = {
-         id: result.insertId,
+        id: result.insertId,
         precoPorUnidade,
         valorDoPedido
       };
