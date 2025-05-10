@@ -67,13 +67,13 @@ module.exports = {
 
 
    async editarProdutos (request, response) {
-  try{
-   const {nomeProduto, descricao, estoque, preco} = request.body;
-   const {id} = request.params;
+      try{
+         const {nomeProduto, descricao, estoque, preco} = request.body;
+         const {id} = request.params;
 
          const sql = `
-            UPDATE produtos SET
-               (prod_nome = ?, prod_desc = ?, prod_est = ?, prod_preco = ?)
+            UPDATE produtos SET 
+               prod_nome = ?, prod_desc = ?, prod_est = ?, prod_preco = ?
             WHERE
                prod_id = ?;
          `;
@@ -83,7 +83,7 @@ module.exports = {
          if (result.affectedRows === 0) {
             return response.status(404).json({
                sucesso: false,
-               mensagem:`Erro ao encontrar o produto`,
+               mensagem:`Erro ao encontrar o produto ${id}`,
                dados: null
             });
          }
@@ -97,14 +97,14 @@ module.exports = {
    
       return response.status(200).json({
           sucesso: true,
-          mensagem:`O produto foi atualizado com sucesso!`,
+          mensagem:`O produto ${id} foi atualizado com sucesso!`,
           dados
       });
 
-   }  catch (error){
+   }  catch (error) {
          return response.status(500).json({
           sucesso: false,
-            mensagem:`Erro ao atualizar o produto.`,
+            mensagem:`Erro ao atualizar o produto ${id}.`,
             dados: error.message
          })
       }
@@ -113,27 +113,34 @@ module.exports = {
 
 
    async apagarProdutos (request, response) {
-  try{
-    return response.status(200).json({
+      try{
+         const {id} = request.params;
+         const sql = `DELETE FROM produtos WHERE prod_id = ?`;
+         const values = [id];
+         const [result] = await db.query(sql, values);
 
-        sucesso: true,
-        mensagem:'apagar produto',
-        dados: null
+         if (result.affectedRows === 0) {
+            return response.status(404).json({
+               sucesso: false,
+               mensagem:`Erro ao deletar o produto ${id}`,
+               dados: null
+            });
+         }
 
-     })
+         return response.status(200).json({
+            sucesso: true,
+            mensagem:`O produto ${id} foi deletado com sucesso!`,
+            dados: null
+         });
+      
+      } catch (error){
+         return response.status(500).json({
+          sucesso: false,
+          mensagem:`Erro ao deletar o produto ${id}.`,
+          dados: error.message
+         });
       }
 
-     catch (error){
-         
-     return response.status(500).json({
-
-        sucesso: false,
-        mensagem:'erro em apagar o produto',
-        dados: error.message
-     })
-
-     }
-
-    },
+   },
 
 }

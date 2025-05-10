@@ -6,7 +6,7 @@ module.exports = {
 
    const sql = `
       SELECT
-      pedpro_id, prod_id, ped_id, pedpro_preco_unit, pedpro_quant
+      pedpro_id, pedpro_preco_unit, pedpro_quant
       FROM Pedido_produto
    `;
 
@@ -80,51 +80,80 @@ module.exports = {
 
    async editarPedido_produto (request, response) {
   try{
-    return response.status(200).json({
+   const {precoPorUnidade, valorDoPedido} = request.body;
+   const {id} = request.params;
 
-        sucesso: true,
-        mensagem:'editar pedidos de produto',
-        dados: null
+      const sql = `
+         UPDATE pedido_produto SET
+         pedpro_preco_unit = ?, pedpro_quant = ?
+         WHERE
+         pedpro_id = ?
+      `;
 
-     })
+      const values = [precoPorUnidade, valorDoPedido, id];
+      const [result] = await db.query(sql, values);
+
+      if (result.affectedRows === 0) {
+         return response.status(404).json({
+            sucesso: false,
+            mensagem:`Erro ao encontrar o pedido do produto ${id}`,
+            dados: null
+         });
       }
 
-     catch (error){
-         
-     return response.status(500).json({
+      const dados = {
+         precoPorUnidade,
+         valorDoPedido
+       };
 
-        sucesso: false,
-        mensagem:'erro na na edição de pedidos de produto',
-        dados: error.message
-     })
+   return response.status(200).json({
+        sucesso: true,
+        mensagem: `O pedido do produto ${id} foi atualizado com sucesso!`,
+        dados
+   });
 
-     }
+   } catch (error) {
+      return response.status(500).json({
+         sucesso: false,
+           mensagem:`Erro ao atualizar o pedido do produto ${id}.`,
+           dados: error.message
+      })
 
-    },
+   }
+
+},
 
 
    async apagarPedido_produto (request, response) {
-  try{
-    return response.status(200).json({
+      try{
+         const {id} = request.params;
+         const sql = `DELETE FROM pedido_produto WHERE pedpro_id = ?`;
+         const values = [id];
+         const [result] = await db.query(sql, values);
 
-        sucesso: true,
-        mensagem:'apagar pedido de produto',
-        dados: null
+         if (result.affectedRows === 0) {
+            return response.status(404).json({
+               sucesso: false,
+               mensagem:`Erro ao deletar o pedido do produto ${id}`,
+               dados: null
+            });
+         }
 
-     })
+         return response.status(200).json({
+            sucesso: true,
+            mensagem:`O pedido do produto ${id} foi deletado com sucesso!`,
+            dados: null
+         });
+      
+      } catch (error){
+         return response.status(500).json({
+          sucesso: false,
+          mensagem:`Erro ao deletar o pedido do produto ${id}.`,
+          dados: error.message
+         });
       }
 
-     catch (error){
-         
-     return response.status(500).json({
+   },
 
-        sucesso: false,
-        mensagem:'erro em apagar pedido de produto',
-        dados: error.message
-     })
-
-     }
-
-    },
 
 }
